@@ -24,7 +24,6 @@ jobs:
 
       - name: Merge Main to Other Branches
           ## Workflow permissions: Read and write permissions (->Save)
-        shell: cmd
         run: |
           git config --local user.name 'Github Action'
           git config --local user.email '244682510@qq.com'

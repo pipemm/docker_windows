@@ -1,5 +1,5 @@
 
-name: Build Image
+name: Build Image (CMD)
 
 # Controls when the workflow will run
 on:
@@ -39,5 +39,6 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Build Docker Image
+        shell: cmd
         run: |
           docker build --no-cache --tag "%LOCAL_IMAGE%" --file "Dockerfile" .
