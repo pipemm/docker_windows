@@ -1,0 +1,134 @@
+
+name: Build Image
+
+# Controls when the workflow will run
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - Dockerfile
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag Name'
+        required: false
+        default: 'latest'
+
+  schedule:
+    - cron: '0    12   2/3  *    *'
+##           │    │    │    │    └─ day of the week  (0 -  6 or SUN-SAT)
+##           │    │    │    └────── month            (1 - 12 or JAN-DEC)
+##           │    │    └─────────── day of the month (1 - 31)
+##           │    └──────────────── hour             (0 - 23)
+##           └───────────────────── minute           (0 - 59)
+
+env:
+  LOCAL_IMAGE : "local-image:${{ github.sha }}"
+  NAMESPACE       : "${{ secrets.DOCKER_NAMESPACE }}"
+  REPOSITORY_NAME : "${{ github.ref_name }}"
+    ## the branch name (`github.ref_name`) of the github repository is the repository name in the container registry
+  TAG_NAME        : "${{ github.event.inputs.tag_name || 'latest' }}"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  caller:
+    if: ${{ github.ref_name == 'main' && github.event_name == 'schedule' }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Trigger Other Branches
+        env:
+          OWNER_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          BRANCH_THIS: ${{ github.ref_name }}
+          ACTION_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ## [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
+          API_RUN="https://api.github.com/repos/${OWNER_REPO}/actions/runs/${RUN_ID}"
+          WORKFLOW_ID=`curl --location \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "${API_RUN}" |\
+            jq --raw-output '.workflow_id'`
+          WORKFLOW_FILE="${WORKFLOW_REF%@*}"
+          WORKFLOW_FILE="${WORKFLOW_FILE##*/}" ## interchangeable with WORKFLOW_ID
+          API_DISPATCH="https://api.github.com/repos/${OWNER_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches"
+          ## https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+          ## [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
+          API_BRANCH="https://api.github.com/repos/${GITHUB_REPOSITORY}/branches"
+          curl --location \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "${API_BRANCH}" |\
+            jq --raw-output '.[].name' |
+            while read -r branch
+            do
+              if [[ "${branch}" == "${BRANCH_THIS}" ]]
+              then
+                continue
+              fi
+              DATA_JSON=`jq --arg 'b' "${branch}" --null-input --compact-output '{"ref":$b}'`
+              curl --location \
+                --request POST \
+                --header 'Accept: application/vnd.github+json' \
+                --header "Authorization: Bearer ${ACTION_TOKEN}" \
+                --header 'X-GitHub-Api-Version: 2022-11-28' \
+                "${API_DISPATCH}" \
+                --data "${DATA_JSON}"
+            done
+
+  process:
+    if: ${{ github.ref_name != 'main' }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+    environment: 
+      name: publish
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Build Docker Image
+        run: |
+          docker build --no-cache --tag "${LOCAL_IMAGE}" --file 'Dockerfile' .
+      
+      - name: Test
+        env:
+          FOLDER_TEST: 'Test/'
+        run: |
+          if [ -d "${FOLDER_TEST}" ]
+          then
+            export TEST_IMAGE="${LOCAL_IMAGE}"
+            ls ${FOLDER_TEST%/}/*.sh |
+              while read -r bfile
+              do
+                echo "running: ${bfile}"
+                bash "${bfile}"
+              done
+          fi
+      
+      - name: Publish
+        env:
+          PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          ### Define Variables
+          IMAGE_NAME="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_NAME}"
+          ###
+          docker tag "${LOCAL_IMAGE}" ${IMAGE_NAME}
+          USERNAME="${NAMESPACE##*/}"
+          echo "${PASSWORD}" | docker login --username "${USERNAME}" --password-stdin
+          docker push "${IMAGE_NAME}"
+          docker logout
+      
+      - name: Clean
+        run: |
+          ### Define Variables
+          IMAGE_NAME="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_NAME}"
+          ###
+          docker rmi --force "${LOCAL_IMAGE}"
+          docker rmi --force "${IMAGE_NAME}"

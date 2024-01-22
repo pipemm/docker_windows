@@ -1,0 +1,45 @@
+name: Distribute Github Workflows to Other Branches
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/*.yaml
+      - .github/workflows/*.yml
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  merge:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge Main to Other Branches
+        run: |
+          git config --local user.name 'Github Action'
+          git config --local user.email '244682510@qq.com'
+          URL_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/branches"
+          ## [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
+          curl --location \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "${URL_API}" |\
+            jq --raw-output '.[].name' |
+            while read -r branch
+              do
+                if [ "${branch}" != 'main' ]
+                then
+                  echo git checkout "${branch}"
+                  git checkout "${branch}"
+                  git merge main --no-edit
+                  git push origin "${branch}"
+                fi
+              done

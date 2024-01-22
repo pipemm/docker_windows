@@ -1,0 +1,85 @@
+
+name: Re-tag Image
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      tag_from:
+        description: 'Tag From'
+        required: true
+        default: 'latest'
+      tag_to:
+        description: 'Tag To'
+        required: true
+        default: 'test'
+
+env:
+  NAMESPACE       : "${{ secrets.DOCKER_NAMESPACE }}"
+  REPOSITORY_NAME : "${{ github.ref_name }}"
+    ## the branch name (`github.ref_name`) of the github repository is the repository name in the container registry
+  TAG_FROM :  ${{ github.event.inputs.tag_from }}
+  TAG_TO   :  ${{ github.event.inputs.tag_to }}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  tagging:
+    if: ${{ github.ref_name != 'main' }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+    environment: 
+      name: publish
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Pull and Test
+        env:
+          FOLDER_TEST : 'Test/'
+        run: |
+          ### Define Variables
+          IMAGE_FROM="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_FROM}"
+          ###
+          docker pull "${IMAGE_FROM}"
+          if [ -d "${FOLDER_TEST}" ]
+          then
+            export TEST_IMAGE="${IMAGE_FROM}"
+            ls ${FOLDER_TEST%/}/*.sh |
+              while read -r bfile
+              do
+                echo "running: ${bfile}"
+                bash "${bfile}"
+              done
+          fi
+      
+      - name: Tag
+        run: |
+          ### Define Variables
+          IMAGE_FROM="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_FROM}"
+          IMAGE_TO="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_TO}"
+          ###
+          docker tag "${IMAGE_FROM}" ${IMAGE_TO}
+
+      - name: Push
+        env:
+          PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          ### Define Variables
+          IMAGE_TO="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_TO}"
+          ###
+          USERNAME="${NAMESPACE##*/}"
+          echo "${PASSWORD}" | docker login --username "${USERNAME}" --password-stdin
+          docker push "${IMAGE_TO}"
+          docker logout
+
+      - name: Clean
+        run: |
+          ### Define Variables
+          IMAGE_FROM="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_FROM}"
+          IMAGE_TO="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_TO}"
+          ###
+          docker rmi --force "${IMAGE_FROM}"
+          docker rmi --force "${IMAGE_TO}"
