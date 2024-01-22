@@ -17,6 +17,14 @@ on:
         required: false
         default: 'latest'
 
+  schedule:
+    - cron: '0    12   2/3  *    *'
+##           │    │    │    │    └─ day of the week  (0 -  6 or SUN-SAT)
+##           │    │    │    └────── month            (1 - 12 or JAN-DEC)
+##           │    │    └─────────── day of the month (1 - 31)
+##           │    └──────────────── hour             (0 - 23)
+##           └───────────────────── minute           (0 - 59)
+
 env:
   LOCAL_IMAGE     : "local-image:${{ github.sha }}"
   NAMESPACE       : "${{ secrets.DOCKER_NAMESPACE }}"
@@ -42,3 +50,18 @@ jobs:
         shell: cmd
         run: |
           docker build --no-cache --tag "%LOCAL_IMAGE%" --file "Dockerfile" .
+      
+      - name: Test
+        shell: cmd
+        env:
+          FOLDER_TEST: 'Test'
+        run: |
+          setlocal
+          if exist "%FOLDER_TEST%\" (
+            set "TEST_IMAGE=%LOCAL_IMAGE%"
+            for %%F in ("%FOLDER_TEST%\*.cmd" "%FOLDER_TEST%\*.bat") do (
+              echo running: %%F
+              cmd.exe "%%F"
+            )
+          )
+          endlocal
