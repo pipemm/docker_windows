@@ -113,7 +113,7 @@ jobs:
           ###
           docker tag "${LOCAL_IMAGE}" ${IMAGE_NAME}
           USERNAME="${NAMESPACE##*/}"
-          echo "${PASSWORD}" | docker login --username "${USERNAME}" --password-stdin
+          echo "${PASSWORD}" | docker login --username "${USERNAME}" --password "${PASSWORD}"
           docker push "${IMAGE_NAME}"
           docker logout
       
