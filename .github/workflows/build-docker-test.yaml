@@ -77,7 +77,7 @@ jobs:
           set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
           rem
           docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
-          set "testspace=dockers/hereisit"
+          set "testspace=hereisit"
           for %%A in ("%testspace%") do set "users=%%~nxA"
           echo %users%
           for %%A in ("%NAMESPACE%") do set "USERNAME=%%~nxA"
