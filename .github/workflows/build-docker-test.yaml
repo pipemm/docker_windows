@@ -78,7 +78,7 @@ jobs:
           rem
           docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
           set "testspace=dockers/hereisit"
-          for %%A in ("%NAMESPACE%") do set "users=%%~nxA"
+          for %%A in ("%testspace%") do set "users=%%~nxA"
           echo %users%
           for %%A in ("%NAMESPACE%") do set "USERNAME=%%~nxA"
             rem [Variable Substitution](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for)
