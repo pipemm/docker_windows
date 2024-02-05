@@ -77,9 +77,11 @@ jobs:
           set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
           rem
           docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
+          set "testspace=dockers/hereisit"
+          for %%A in ("%NAMESPACE%") do set "users=%%~nxA"
+          echo %users%
           for %%A in ("%NAMESPACE%") do set "USERNAME=%%~nxA"
             rem [Variable Substitution](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for)
-          echo %USERNAME%
           echo %PASSWORD% | docker login --username %USERNAME% --password-stdin
           docker push "%IMAGE_NAME%"
           docker logout
