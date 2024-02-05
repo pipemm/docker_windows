@@ -67,3 +67,18 @@ jobs:
             )
           )
           endlocal
+      
+      - name: Publish
+        shell: cmd
+        env:
+          PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          rem Define Variables
+          set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
+          rem
+          docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
+          for %%A in ("%NAMESPACE%") do set "USERNAME=%%~nxA"
+            rem [Variable Substitution](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for)
+          echo "%PASSWORD%" | docker login --username "%USERNAME%" --password-stdin
+          docker push "%IMAGE_NAME%"
+          docker logout
