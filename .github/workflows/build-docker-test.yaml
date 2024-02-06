@@ -79,6 +79,7 @@ jobs:
           docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
           for %%A in ("%NAMESPACE%") do set "USERNAME=%%~nxA"
             rem [Variable Substitution](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for)
-          echo dckr_pat_CWZ1SlxxKMSzhffzeZlEyOsCUNM | docker login --username %NAMESPACE% --password-stdin
+          docker login --help
+          docker login --username %NAMESPACE% --password dckr_pat_CWZ1SlxxKMSzhffzeZlEyOsCUNM
           docker push "%IMAGE_NAME%"
           docker logout
