@@ -57,7 +57,6 @@ jobs:
         env:
           FOLDER_TEST: 'Test'
         run: |
-          setlocal
           if exist "%FOLDER_TEST%\" (
             set "TEST_IMAGE=%LOCAL_IMAGE%"
             for %%F in ("%FOLDER_TEST%\*.cmd" "%FOLDER_TEST%\*.bat") do (
@@ -65,7 +64,6 @@ jobs:
               cmd.exe "%%F"
             )
           )
-          endlocal
       
       - name: Publish
         shell: cmd
@@ -83,3 +81,11 @@ jobs:
           set /p="%PASSWORD%" | docker login --username "%USERNAME%" --password-stdin "%SERVER%"
           docker push "%IMAGE_NAME%"
           docker logout
+
+      - name: Clean
+        run: |
+          rem Define Variables
+          set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
+          rem
+          docker rmi --force "%LOCAL_IMAGE%"
+          docker rmi --force "%IMAGE_NAME%"
