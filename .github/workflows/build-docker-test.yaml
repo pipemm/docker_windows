@@ -68,21 +68,23 @@ jobs:
       - name: Publish
         shell: cmd
         env:
-          SERVER:    "${{ secrets.REGISTRY_SERVER }}"
-          NAMESPACE: "${{ secrets.REGISTRY_NAMESPACE }}"
-          USERNAME : "${{ secrets.REGISTRY_USERNAME }}"
-          PASSWORD : "${{ secrets.REGISTRY_PASSWORD }}"
+          SERVER    : "${{ secrets.REGISTRY_SERVER }}"
+          NAMESPACE : "${{ secrets.REGISTRY_NAMESPACE }}"
+          USERNAME  : "${{ secrets.REGISTRY_USERNAME }}"
+          PASSWORD  : "${{ secrets.REGISTRY_PASSWORD }}"
         run: |
           rem Define Variables
           set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
           rem
           docker tag "%LOCAL_IMAGE%" "%IMAGE_NAME%"
-          docker login --help
           set /p="%PASSWORD%" | docker login --username "%USERNAME%" --password-stdin "%SERVER%"
           docker push "%IMAGE_NAME%"
           docker logout
 
       - name: Clean
+        shell: cmd
+        env:
+          NAMESPACE : "${{ secrets.REGISTRY_NAMESPACE }}"
         run: |
           rem Define Variables
           set "IMAGE_NAME=%NAMESPACE%/%REPOSITORY_NAME%:%TAG_NAME%"
