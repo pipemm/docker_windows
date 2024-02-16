@@ -52,7 +52,8 @@ jobs:
           curl --location ^
             --header 'Accept: application/vnd.github+json' ^
             --header 'X-GitHub-Api-Version: 2022-11-28' ^
-            "%API_RUN%"
+            "%API_RUN%" |^
+            jq --raw-output ".workflow_id"
           WORKFLOW_ID=`curl --location \
             --header 'Accept: application/vnd.github+json' \
             --header 'X-GitHub-Api-Version: 2022-11-28' \
