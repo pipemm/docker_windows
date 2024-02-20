@@ -50,18 +50,23 @@ jobs:
         run: |
           REM [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
           set "API_RUN=https://api.github.com/repos/%OWNER_REPO%/actions/runs/%RUN_ID%"
+          REM Get WORKFLOW_ID
           for /f %%A in ('
-              curl --location ^
+            curl --location ^
               --header "Accept: application/vnd.github+json" ^
               --header "X-GitHub-Api-Version: 2022-11-28" ^
               "%API_RUN%" ^| jq --raw-output ".workflow_id"
           ') do (
               set "WORKFLOW_ID=%%A"
           )
+          REM WORKFLOW_FILE is interchangeable with WORKFLOW_ID
+          for /f "tokens=1 delims=@" %%A in ("%WORKFLOW_REF%") do (
+            set "WORKFLOW_FILE=%%A"
+          )
           echo WORKFLOW_ID=%WORKFLOW_ID%
-          echo WORKFLOW_REF=%WORKFLOW_REF%
+          echo WORKFLOW_FILE=%WORKFLOW_FILE%
           WORKFLOW_FILE="${WORKFLOW_REF%@*}"
-          WORKFLOW_FILE="${WORKFLOW_FILE##*/}" ## interchangeable with WORKFLOW_ID
+          WORKFLOW_FILE="${WORKFLOW_FILE##*/}"
           set "API_DISPATCH=https://api.github.com/repos/%OWNER_REPO%/actions/workflows/%WORKFLOW_ID%/dispatches"
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
