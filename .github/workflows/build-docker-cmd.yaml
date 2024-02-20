@@ -64,6 +64,7 @@ jobs:
             set "WORKFLOW_FILE=%%A"
           )
           for /f "tokens=* delims=/" %%A in ("%WORKFLOW_FILE%") do (
+            echo %%A
             set "WORKFLOW_FILE=%%A"
           )
           echo WORKFLOW_ID=%WORKFLOW_ID%
