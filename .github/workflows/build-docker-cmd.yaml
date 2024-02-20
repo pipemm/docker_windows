@@ -88,7 +88,7 @@ jobs:
               jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
             )
           )
-          
+          echo CMD_DATA=%CMD_DATA%
           
           curl --location ^
             --header "Accept: application/vnd.github+json" ^
