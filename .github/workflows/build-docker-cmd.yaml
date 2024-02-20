@@ -72,11 +72,25 @@ jobs:
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
           set "API_BRANCH=https://api.github.com/repos/%GITHUB_REPOSITORY%/branches"
+          for /f %%B in ('
+            curl --location ^
+              --header "Accept: application/vnd.github+json" ^
+              --header "X-GitHub-Api-Version: 2022-11-28" ^
+              "%API_BRANCH%" ^|^
+            jq --raw-output ".[].name"
+          ') do (
+            if "%%B" neq "%BRANCH_THIS%" (
+              echo %%B
+              set "cmd_data="
+            )
+          )
           curl --location ^
             --header "Accept: application/vnd.github+json" ^
             --header "X-GitHub-Api-Version: 2022-11-28" ^
             "%API_BRANCH%" |^
           jq --raw-output ".[].name"
+          jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
+          jq --arg "b" "test" --null-input --compact-output '{"ref":$b}'
           curl --location ^
             --header "Accept: application/vnd.github+json" ^
             --header "X-GitHub-Api-Version: 2022-11-28" ^
