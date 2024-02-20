@@ -51,20 +51,20 @@ jobs:
           REM [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
           set "API_RUN=https://api.github.com/repos/%OWNER_REPO%/actions/runs/%RUN_ID%"
           REM Get WORKFLOW_ID
-          for /f %%A in ('
+          for /f %%I in ('
             curl --location ^
               --header "Accept: application/vnd.github+json" ^
               --header "X-GitHub-Api-Version: 2022-11-28" ^
               "%API_RUN%" ^| jq --raw-output ".workflow_id"
           ') do (
-              set "WORKFLOW_ID=%%A"
+            set "WORKFLOW_ID=%%I"
           )
           REM WORKFLOW_FILE is interchangeable with WORKFLOW_ID
-          for /f "tokens=1 delims=@" %%A in ("%WORKFLOW_REF%") do (
-            set "WORKFLOW_FILE=%%A"
+          for /f "tokens=1 delims=@" %%F in ("%WORKFLOW_REF%") do (
+            set "WORKFLOW_FILE=%%F"
           )
-          for %%A in ("%WORKFLOW_FILE%") do (
-            set "WORKFLOW_FILE=%%~nxA"
+          for %%F in ("%WORKFLOW_FILE%") do (
+            set "WORKFLOW_FILE=%%~nxF"
           ) 
           echo WORKFLOW_ID=%WORKFLOW_ID%
           echo WORKFLOW_FILE=%WORKFLOW_FILE%
