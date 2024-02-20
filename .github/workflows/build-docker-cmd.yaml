@@ -84,7 +84,7 @@ jobs:
               set "cmd_data=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
               echo %cmd_data%
               jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
-              set "cmd_data=jq --arg "
+              set "cmd_data=jq"
               echo %cmd_data%
             )
           )
