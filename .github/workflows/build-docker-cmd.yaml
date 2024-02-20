@@ -68,8 +68,6 @@ jobs:
           ) 
           echo WORKFLOW_ID=%WORKFLOW_ID%
           echo WORKFLOW_FILE=%WORKFLOW_FILE%
-          WORKFLOW_FILE="${WORKFLOW_REF%@*}"
-          WORKFLOW_FILE="${WORKFLOW_FILE##*/}"
           set "API_DISPATCH=https://api.github.com/repos/%OWNER_REPO%/actions/workflows/%WORKFLOW_ID%/dispatches"
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
