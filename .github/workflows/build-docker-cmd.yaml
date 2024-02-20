@@ -67,8 +67,6 @@ jobs:
           for %%F in ("%WORKFLOW_FILE%") do (
             set "WORKFLOW_FILE=%%~nxF"
           ) 
-          echo WORKFLOW_ID=%WORKFLOW_ID%
-          echo WORKFLOW_FILE=%WORKFLOW_FILE%
           set "API_DISPATCH=https://api.github.com/repos/%OWNER_REPO%/actions/workflows/%WORKFLOW_ID%/dispatches"
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
@@ -82,11 +80,8 @@ jobs:
             jq --raw-output ".[].name"
           ') do (
             if "%%B" neq "%BRANCH_THIS%" (
-              set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}" | jq --raw-input --raw-output ".""
+              set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}" | jq --raw-input ".""
               for /f %%D in ('!CMD_DATA!') do (
-                echo %API_DISPATCH%
-                echo %%D
-                jq --arg "b" "test" --null-input --raw-output --compact-output "{\"ref\":$b}" | jq --raw-input --raw-output "."
                 curl --location ^
                   --request POST ^
                   --header "Accept: application/vnd.github+json" ^
