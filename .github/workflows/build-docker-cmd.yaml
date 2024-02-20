@@ -72,14 +72,14 @@ jobs:
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
           set "API_BRANCH=https://api.github.com/repos/%GITHUB_REPOSITORY%/branches"
-          curl --location \
+          curl --location ^
             --header "Accept: application/vnd.github+json" ^
             --header "X-GitHub-Api-Version: 2022-11-28" ^
             "%API_BRANCH%" |^
           jq --raw-output ".[].name"
-          curl --location \
-            --header "Accept: application/vnd.github+json" \
-            --header "X-GitHub-Api-Version: 2022-11-28" \
+          curl --location ^
+            --header "Accept: application/vnd.github+json" ^
+            --header "X-GitHub-Api-Version: 2022-11-28" ^
             "${API_BRANCH}" |\
             jq --raw-output '.[].name' |
             while read -r branch
@@ -89,12 +89,12 @@ jobs:
                 continue
               fi
               DATA_JSON=`jq --arg 'b' "${branch}" --null-input --compact-output '{"ref":$b}'`
-              curl --location \
-                --request POST \
-                --header 'Accept: application/vnd.github+json' \
-                --header "Authorization: Bearer ${ACTION_TOKEN}" \
-                --header 'X-GitHub-Api-Version: 2022-11-28' \
-                "${API_DISPATCH}" \
+              curl --location ^
+                --request POST ^
+                --header "Accept: application/vnd.github+json" ^
+                --header "Authorization: Bearer ${ACTION_TOKEN}" ^
+                --header "X-GitHub-Api-Version: 2022-11-28" ^
+                "${API_DISPATCH}" ^
                 --data "${DATA_JSON}"
             done
 
