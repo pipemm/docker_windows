@@ -82,6 +82,8 @@ jobs:
           ') do (
             if "%%B" neq "%BRANCH_THIS%" (
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
+              echo %API_DISPATCH%
+              echo %%D
               for /f %%D in ('!CMD_DATA!') do (
                 curl --location ^
                   --request POST ^
@@ -94,27 +96,6 @@ jobs:
             )
           )
           endlocal
-          
-          curl --location ^
-            --header "Accept: application/vnd.github+json" ^
-            --header "X-GitHub-Api-Version: 2022-11-28" ^
-            "${API_BRANCH}" |\
-            jq --raw-output '.[].name' |
-            while read -r branch
-            do
-              if [[ "${branch}" == "${BRANCH_THIS}" ]]
-              then
-                continue
-              fi
-              DATA_JSON=`jq --arg 'b' "${branch}" --null-input --compact-output '{"ref":$b}'`
-              curl --location ^
-                --request POST ^
-                --header "Accept: application/vnd.github+json" ^
-                --header "Authorization: Bearer ${ACTION_TOKEN}" ^
-                --header "X-GitHub-Api-Version: 2022-11-28" ^
-                "${API_DISPATCH}" ^
-                --data "${DATA_JSON}"
-            done
 
   process:
     if: ${{ github.ref_name != 'main' }}
