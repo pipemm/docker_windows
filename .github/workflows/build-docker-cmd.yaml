@@ -53,16 +53,18 @@ jobs:
             --header 'Accept: application/vnd.github+json' ^
             --header 'X-GitHub-Api-Version: 2022-11-28' ^
             "%API_RUN%"
+          echo test 1
           curl --location ^
             --header 'Accept: application/vnd.github+json' ^
             --header 'X-GitHub-Api-Version: 2022-11-28' ^
             "%API_RUN%" |^
             jq --raw-output ".workflow_id"
+          echo test 2
           WORKFLOW_ID=`curl --location \
             --header 'Accept: application/vnd.github+json' \
             --header 'X-GitHub-Api-Version: 2022-11-28' \
             "${API_RUN}" |\
-            jq --raw-output ".workflow_id'`
+            jq --raw-output ".workflow_id"`
           WORKFLOW_FILE="${WORKFLOW_REF%@*}"
           WORKFLOW_FILE="${WORKFLOW_FILE##*/}" ## interchangeable with WORKFLOW_ID
           API_DISPATCH="https://api.github.com/repos/${OWNER_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches"
