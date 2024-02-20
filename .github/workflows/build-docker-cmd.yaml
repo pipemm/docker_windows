@@ -72,6 +72,7 @@ jobs:
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
           set "API_BRANCH=https://api.github.com/repos/%GITHUB_REPOSITORY%/branches"
+          setlocal enabledelayedexpansion
           for /f %%B in ('
             curl --location ^
               --header "Accept: application/vnd.github+json" ^
@@ -80,15 +81,15 @@ jobs:
             jq --raw-output ".[].name"
           ') do (
             set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
-            echo CMD_DATA=%CMD_DATA%
+            echo CMD_DATA=!CMD_DATA!
             if "%%B" neq "%BRANCH_THIS%" (
               echo %%B
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
-              echo CMD_DATA=%CMD_DATA%
+              echo CMD_DATA=!CMD_DATA!
               jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
             )
           )
-          echo CMD_DATA=%CMD_DATA%
+          endlocal
           
           curl --location ^
             --header "Accept: application/vnd.github+json" ^
