@@ -63,7 +63,9 @@ jobs:
           for /f "tokens=1 delims=@" %%A in ("%WORKFLOW_REF%") do (
             set "WORKFLOW_FILE=%%A"
           )
-          set "WORKFLOW_FILE=%%~nxWORKFLOW_FILE"
+          for %%A in ("%WORKFLOW_FILE%") do (
+            set "WORKFLOW_FILE=%%~nxA"
+          ) 
           echo WORKFLOW_ID=%WORKFLOW_ID%
           echo WORKFLOW_FILE=%WORKFLOW_FILE%
           WORKFLOW_FILE="${WORKFLOW_REF%@*}"
