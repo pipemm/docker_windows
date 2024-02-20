@@ -86,7 +86,7 @@ jobs:
               for /f %%D in ('!CMD_DATA!') do (
                 echo %API_DISPATCH%
                 echo %%D
-                jq --arg "b" "test" --null-input --raw-output --compact-output "{\"ref\":$b}"
+                jq --arg "b" "test" --null-input --raw-output --compact-output "{\"ref\":$b}" | jq --raw-input "."
                 curl --location ^
                   --request POST ^
                   --header "Accept: application/vnd.github+json" ^
