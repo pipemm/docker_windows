@@ -80,13 +80,13 @@ jobs:
               "%API_BRANCH%" ^|^
             jq --raw-output ".[].name"
           ') do (
-            set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
-            echo CMD_DATA=!CMD_DATA!
             if "%%B" neq "%BRANCH_THIS%" (
               echo %%B
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
               echo CMD_DATA=!CMD_DATA!
-              jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
+              for /f %%D in ('!CMD_DATA!') do (
+                echo !CMD_DATA!
+              )
             )
           )
           endlocal
