@@ -58,16 +58,20 @@ jobs:
               set "WORKFLOW_ID=%%A"
           )
           echo WORKFLOW_ID=%WORKFLOW_ID%
-          echo %WORKFLOW_REF%
+          echo WORKFLOW_REF=%WORKFLOW_REF%
           WORKFLOW_FILE="${WORKFLOW_REF%@*}"
           WORKFLOW_FILE="${WORKFLOW_FILE##*/}" ## interchangeable with WORKFLOW_ID
-          API_DISPATCH="https://api.github.com/repos/${OWNER_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches"
+          set "API_DISPATCH=https://api.github.com/repos/%OWNER_REPO%/actions/workflows/%WORKFLOW_ID%/dispatches"
           REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
           REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
-          API_BRANCH="https://api.github.com/repos/${GITHUB_REPOSITORY}/branches"
+          set "API_BRANCH=https://api.github.com/repos/%GITHUB_REPOSITORY%/branches"
           curl --location \
-            --header 'Accept: application/vnd.github+json' \
-            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "${API_BRANCH}" | jq --raw-output ".[].name"
+          curl --location \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
             "${API_BRANCH}" |\
             jq --raw-output '.[].name' |
             while read -r branch
