@@ -81,11 +81,11 @@ jobs:
           ') do (
             if "%%B" neq "%BRANCH_THIS%" (
               echo %%B
-              set "cmd_data=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
-              echo %cmd_data%
+              set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
+              echo %CMD_DATA%
               jq --arg "b" "test" --null-input --compact-output "{\"ref\":$b}"
-              set "cmd_data=jq"
-              echo %cmd_data%
+              set "CMD_DATA=jq"
+              echo %CMD_DATA%
             )
           )
           
