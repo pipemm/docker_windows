@@ -34,8 +34,7 @@ env:
 jobs:
 
   caller:
-    ##if: ${{ github.ref_name == 'main' && github.event_name == 'schedule' }}
-    if: ${{ github.ref_name == 'main' }}
+    if: ${{ github.ref_name == 'main' && github.event_name == 'schedule' }}
     runs-on: windows-2022
 
     steps:
