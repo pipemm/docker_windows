@@ -83,7 +83,7 @@ jobs:
             if "%%B" neq "%BRANCH_THIS%" (
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
               echo %API_DISPATCH%
-              echo %%D
+              echo DATA=%%D
               for /f %%D in ('!CMD_DATA!') do (
                 curl --location ^
                   --request POST ^
