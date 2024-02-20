@@ -52,18 +52,22 @@ jobs:
           curl --location ^
             --header 'Accept: application/vnd.github+json' ^
             --header 'X-GitHub-Api-Version: 2022-11-28' ^
+            "%API_RUN%"
+          curl --location ^
+            --header 'Accept: application/vnd.github+json' ^
+            --header 'X-GitHub-Api-Version: 2022-11-28' ^
             "%API_RUN%" |^
             jq --raw-output ".workflow_id"
           WORKFLOW_ID=`curl --location \
             --header 'Accept: application/vnd.github+json' \
             --header 'X-GitHub-Api-Version: 2022-11-28' \
             "${API_RUN}" |\
-            jq --raw-output '.workflow_id'`
+            jq --raw-output ".workflow_id'`
           WORKFLOW_FILE="${WORKFLOW_REF%@*}"
           WORKFLOW_FILE="${WORKFLOW_FILE##*/}" ## interchangeable with WORKFLOW_ID
           API_DISPATCH="https://api.github.com/repos/${OWNER_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches"
-          ## https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
-          ## [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
+          REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+          REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
           API_BRANCH="https://api.github.com/repos/${GITHUB_REPOSITORY}/branches"
           curl --location \
             --header 'Accept: application/vnd.github+json' \
