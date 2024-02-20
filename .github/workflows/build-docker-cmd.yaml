@@ -83,8 +83,8 @@ jobs:
             if "%%B" neq "%BRANCH_THIS%" (
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
               echo %API_DISPATCH%
-              echo DATA=%%D
               for /f %%D in ('!CMD_DATA!') do (
+                echo DATA=%%D
                 curl --location ^
                   --request POST ^
                   --header "Accept: application/vnd.github+json" ^
