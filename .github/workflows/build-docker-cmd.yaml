@@ -85,7 +85,7 @@ jobs:
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
               echo CMD_DATA=!CMD_DATA!
               for /f %%D in ('!CMD_DATA!') do (
-                echo ABC=!CMD_DATA!
+                echo ABC=%%D
               )
             )
           )
