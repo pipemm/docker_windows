@@ -47,10 +47,10 @@ jobs:
           WORKFLOW_REF : ${{ github.workflow_ref }}
           ACTION_TOKEN : ${{ secrets.GITHUB_TOKEN }}
         run: |
-          REM [for](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for "for {%% | %}<variable> in (<set>) do <command> [<commandlineoptions>]")
-          REM [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
+          rem [for](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for "for {%% | %}<variable> in (<set>) do <command> [<commandlineoptions>]")
+          rem [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
           set "API_RUN=https://api.github.com/repos/%OWNER_REPO%/actions/runs/%RUN_ID%"
-          REM Get WORKFLOW_ID
+          rem Get WORKFLOW_ID
           for /f %%I in ('
             curl --location ^
               --header "Accept: application/vnd.github+json" ^
@@ -59,7 +59,7 @@ jobs:
           ') do (
             set "WORKFLOW_ID=%%I"
           )
-          REM WORKFLOW_FILE is interchangeable with WORKFLOW_ID
+          rem WORKFLOW_FILE is interchangeable with WORKFLOW_ID
           for /f "tokens=1 delims=@" %%F in ("%WORKFLOW_REF%") do (
             set "WORKFLOW_FILE=%%F"
           )
@@ -67,8 +67,8 @@ jobs:
             set "WORKFLOW_FILE=%%~nxF"
           ) 
           set "API_DISPATCH=https://api.github.com/repos/%OWNER_REPO%/actions/workflows/%WORKFLOW_ID%/dispatches"
-          REM https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
-          REM [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
+          rem https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+          rem [Use the REST API to get branches](https://docs.github.com/en/rest/branches/branches)
           set "API_BRANCH=https://api.github.com/repos/%GITHUB_REPOSITORY%/branches"
           setlocal enabledelayedexpansion
           for /f %%B in ('
