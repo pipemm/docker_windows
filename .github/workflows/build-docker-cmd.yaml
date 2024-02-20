@@ -86,13 +86,14 @@ jobs:
               for /f %%D in ('!CMD_DATA!') do (
                 echo %API_DISPATCH%
                 echo %%D
+                jq --arg "b" "test" --null-input --raw-output --compact-output "{\"ref\":$b}"
                 curl --location ^
                   --request POST ^
                   --header "Accept: application/vnd.github+json" ^
                   --header "Authorization: Bearer %ACTION_TOKEN%" ^
                   --header "X-GitHub-Api-Version: 2022-11-28" ^
                   "%API_DISPATCH%" ^
-                  --data-raw %%D
+                  --data %%D
               )
             )
           )
