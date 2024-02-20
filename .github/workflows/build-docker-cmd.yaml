@@ -79,6 +79,8 @@ jobs:
               "%API_BRANCH%" ^|^
             jq --raw-output ".[].name"
           ') do (
+            set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
+            echo CMD_DATA=%CMD_DATA%
             if "%%B" neq "%BRANCH_THIS%" (
               echo %%B
               set "CMD_DATA=jq --arg "b" "%%B" --null-input --compact-output "{\"ref\":$b}""
