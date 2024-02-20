@@ -48,6 +48,7 @@ jobs:
           WORKFLOW_REF : ${{ github.workflow_ref }}
           ACTION_TOKEN : ${{ secrets.GITHUB_TOKEN }}
         run: |
+          REM [for](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/for "for {%% | %}<variable> in (<set>) do <command> [<commandlineoptions>]")
           REM [Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
           set "API_RUN=https://api.github.com/repos/%OWNER_REPO%/actions/runs/%RUN_ID%"
           REM Get WORKFLOW_ID
@@ -91,7 +92,7 @@ jobs:
                   --header "Authorization: Bearer %ACTION_TOKEN%" ^
                   --header "X-GitHub-Api-Version: 2022-11-28" ^
                   "%API_DISPATCH%" ^
-                  --data %%D
+                  --data-raw %%D
               )
             )
           )
