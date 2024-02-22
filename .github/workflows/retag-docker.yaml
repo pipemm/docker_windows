@@ -29,7 +29,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
     environment: 
-      name: publish
+      name: publish0
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -65,7 +65,10 @@ jobs:
 
       - name: Push
         env:
-          PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          SERVER    : "${{ secrets.REGISTRY_SERVER }}"
+          NAMESPACE : "${{ secrets.REGISTRY_NAMESPACE }}"
+          USERNAME  : "${{ secrets.REGISTRY_USERNAME }}"
+          PASSWORD  : "${{ secrets.REGISTRY_PASSWORD }}"
         run: |
           ### Define Variables
           IMAGE_TO="${NAMESPACE}/${REPOSITORY_NAME}:${TAG_TO}"
