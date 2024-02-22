@@ -1,5 +1,5 @@
 
-name: Re-tag Image
+name: Re-tag Image (CMD)
 
 # Controls when the workflow will run
 on:
